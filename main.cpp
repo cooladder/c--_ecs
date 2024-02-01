@@ -1,5 +1,6 @@
 #include "ECS.hpp"
 #include "EntityManager.hpp"
+#include "System.hpp"
 #include "ComponentManager.hpp"
 #include <iostream>
 int main(){

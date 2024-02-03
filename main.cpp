@@ -9,12 +9,8 @@ int main(){
 
     Entity a = EntityManager::getUniqueID();
     Entity b = EntityManager::getUniqueID();
-    Entity c = EntityManager::getUniqueID();
-    Entity d = EntityManager::getUniqueID();
     EntityManager::add(a);
     EntityManager::add(b);
-    EntityManager::add(c);
-    EntityManager::add(d);
     ComponentManager::registerComponent<Translation>();
     ComponentManager::registerComponent<Speed>();
     Translation dataA = {0, 1};
@@ -27,14 +23,18 @@ int main(){
     ComponentManager::setComponentData<Speed>(b, dataD);
 
     Translation out = ComponentManager::getComponentData<Translation>(a);
+    Speed dout = ComponentManager::getComponentData<Speed>(b);
     std::cout << out.position << " " << out.algle << std::endl;
-    Speed dout = ComponentManager::getComponentData<Speed>(a);
-    std::cout << dout.speed<< " " << dout.accelaration<< std::endl;
-    std::cout << EntityManager::find(a) << std::endl;
-    std::cout << EntityManager::find(b) << std::endl;
-    ComponentManager::removeComponentData<Translation>(a);
-    std::cout << EntityManager::find(a) << std::endl;
-    std::cout << EntityManager::find(b) << std::endl;
+    std::cout << dout.accelaration<< " " << dout.speed<< std::endl;
+    // EntityManager::remove(a);
+
+    // Entity c = EntityManager::getUniqueID();
+    // EntityManager::add(c);
+    // ComponentManager::setComponentData<Translation>(b, dataB);
+    // ComponentManager::setComponentData<Speed>(a, dataC);
+
+    // Translation o = ComponentManager::getComponentData<Translation>(c);
+    // std::cout << o.position << " " << o.algle << std::endl;
 
     return 0;
 }

@@ -3,7 +3,7 @@
 #include <bitset>
 
 
-const int MAX_ENTITY = 100;
+const int MAX_ENTITY = 2;
 using Entity = int16_t;
 const int MAX_COMPONENTS = 32;
 using Signature = std::bitset<MAX_COMPONENTS>;

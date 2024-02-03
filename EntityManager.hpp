@@ -43,7 +43,8 @@ public:
         getSignatureArray()[entity] = data;
     };
     /**
-     * static remove function removees the entity from the entityManager
+     * //static remove function removees the entity from the entityManager
+     * Use ComponentManager::remove instead
     */
     static void remove(Entity entity){
         assert(getSignatureArray()[entity] != 0);

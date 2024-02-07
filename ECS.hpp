@@ -10,7 +10,7 @@ using Signature = std::bitset<MAX_COMPONENTS>;
 
 struct Translation{
     int position;
-    int algle;
+    int angle;
 }; typedef struct Translation Translation;
 
 struct speed{

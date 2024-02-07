@@ -2,39 +2,29 @@
 #include "EntityManager.hpp"
 #include "System.hpp"
 #include "ComponentManager.hpp"
+#include "q.hpp"
 #include <iostream>
+#include "t.hpp"
 int main(){
     EntityManager::init();
-    ComponentManager::init();
+    // ComponentManager::init();
+    q::init();
 
     Entity a = EntityManager::getUniqueID();
-    Entity b = EntityManager::getUniqueID();
-    EntityManager::add(a);
-    EntityManager::add(b);
-    ComponentManager::registerComponent<Translation>();
-    ComponentManager::registerComponent<Speed>();
-    Translation dataA = {0, 1};
-    Translation dataB = {2, 3};
-    Speed dataC = {4, 5};
-    Speed dataD = {6, 7};
-    ComponentManager::setComponentData<Translation>(a, dataA);
-    ComponentManager::setComponentData<Translation>(b, dataB);
-    ComponentManager::setComponentData<Speed>(a, dataC);
-    ComponentManager::setComponentData<Speed>(b, dataD);
+    Translation data = {0, 1};
+    Speed da = {12, 13};
+    q::registerEntity(a);
+    q::setComponentData<Translation>(a, &data);
+    q::setComponentData<Speed>(a, &da);
+    Translation o = q::findComponentData<Translation>(a);
+    Speed ou = q::findComponentData<Speed>(a);
 
-    Translation out = ComponentManager::getComponentData<Translation>(a);
-    Speed dout = ComponentManager::getComponentData<Speed>(b);
-    std::cout << out.position << " " << out.algle << std::endl;
-    std::cout << dout.accelaration<< " " << dout.speed<< std::endl;
-    // EntityManager::remove(a);
+    std::cout << o.position << o.angle << std::endl;
+    std::cout << ou.speed << ou.accelaration << std::endl;
 
-    // Entity c = EntityManager::getUniqueID();
-    // EntityManager::add(c);
-    // ComponentManager::setComponentData<Translation>(b, dataB);
-    // ComponentManager::setComponentData<Speed>(a, dataC);
+    // data  = {4, 5};
 
-    // Translation o = ComponentManager::getComponentData<Translation>(c);
-    // std::cout << o.position << " " << o.algle << std::endl;
-
+    // o = q::findComponentData<Translation>(a);
+    // std::cout << o.position << o.angle << std::endl;
     return 0;
 }

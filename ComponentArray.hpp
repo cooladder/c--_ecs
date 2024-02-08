@@ -1,62 +1,61 @@
 #pragma once
 #include "ECS.hpp"
 #include <array>
-#include <stack>
 #include <unordered_map>
+#include <stack>
 #include <cassert>
-template<typename T>
-class ComponentArray
+#include <typeinfo>
+#include <typeindex>
+
+class ComponentArray 
 {
 private:
-    std::array<T, MAX_ENTITY> idToData;
-    std::unordered_map<Entity, int> entityToId;
+    std::array<void*, MAX_COMPONENTS> idToData;
+    std::unordered_map<std::type_index, int> componentToId;
     std::stack<int> idGenerator;
-    int end = -1; // the end index
+    int end = -1;
 public:
     ComponentArray(){
-        for(int i = MAX_ENTITY-1; i >= 0; i--)
+        for(int i = MAX_COMPONENTS-1; i >= 0; i--)
             idGenerator.push(i);
     };
-    /**
-     * Use setData to update or add a new data
-    */
-    void setData(Entity entity, T data){
-        assert(idGenerator.size() != 0);
-        if(entityToId.find(entity) != entityToId.end()){
-            idToData[entityToId[entity]] = data;
-            return;
-        }
+
+    template<typename T>
+    void genSpace(){
+        assert(!idGenerator.empty() && componentToId.find(std::type_index(typeid(T))) == componentToId.end());
         int id = idGenerator.top();
         idGenerator.pop();
-        entityToId[entity] = id; 
-        idToData[id] = data;
+        componentToId[std::type_index(typeid(T))] = id; 
+        idToData[id] = new T;
         end++;
-    };
-    /**
-     * Use find to get the target entity data.
-     * IMPORTANT: You cannot modify data using find method, using setData() instead
-     * @param entity the target
-    */
-    T find(Entity entity){
-        assert(entityToId.find(entity) != entityToId.end());
-        return idToData[entityToId[entity]];
-    };
-    /**
-     * Remove the given entity and make array packed
-    */
-    void remove(Entity entity){
-        assert(entityToId.find(entity) != entityToId.end());
-        int id = entityToId[entity];
-        entityToId.erase(entity);
+    }
+
+    template<typename T>
+    void setData(T data){
+        assert(componentToId.find(std::type_index(typeid(T))) != componentToId.end());
+        *(T*)idToData[componentToId[std::type_index(typeid(T))]] = data;
+    }
+
+    template<typename T>
+    T find(){
+        assert(componentToId.find(std::type_index(typeid(T))) != componentToId.end());
+        return *(T*)idToData[componentToId[std::type_index(typeid(T))]];
+    }
+
+    template<typename T>
+    void remove(){
+        assert(componentToId.find(std::type_index(typeid(T))) != componentToId.end());
+        int id = componentToId[std::type_index(typeid(T))];
+        componentToId.erase(std::type_index(typeid(T)));
+        free(idToData[id]);
         idToData[id] = idToData[end];
         Entity lastEntity;
-        for(auto& it: entityToId)
+        for(auto& it: componentToId)
             if(it.second == end){
                 it.second = id;
                 break;
             }
         idGenerator.push(end);
         end--;
-    };
-
+    }
 };

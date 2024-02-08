@@ -2,46 +2,41 @@
 #include "EntityManager.hpp"
 #include "System.hpp"
 #include "ComponentManager.hpp"
-#include "q.hpp"
 #include <iostream>
-#include "t.hpp"
 int main(){
+
+    ComponentManager::init();
     EntityManager::init();
-    // ComponentManager::init();
-    q::init();
 
     Entity a = EntityManager::getUniqueID();
-    Translation data = {0, 1};
-    Speed da = {12, 13};
-    q::registerEntity(a);
-    q::registerComponent<Translation>(a);
-    q::registerComponent<Speed>(a);
-    q::setComponentData<Translation>(a, data);
-    q::setComponentData<Speed>(a, da);
-    Translation o = q::findComponentData<Translation>(a);
-    Speed ou = q::findComponentData<Speed>(a);
+    Translation trans = {1, 2};
+    Speed speed = {1, 13};
+    Test test = {5};
+    ComponentManager::registerEntity(a);
+    ComponentManager::registerComponent<Translation>(a);
+    ComponentManager::registerComponent<Speed>(a);
+    ComponentManager::registerComponent<Test>(a);
+    ComponentManager::setComponentData<Translation>(a, trans);
+    ComponentManager::setComponentData<Speed>(a, speed);
+    ComponentManager::setComponentData<Test>(a, test);
 
-    std::cout << o.position << o.angle << std::endl;
-    std::cout << ou.speed << ou.accelaration << std::endl;
+    std::cout << ComponentManager::findComponentData<Test>(a).tt << std::endl;
+    std::cout << ComponentManager::findComponentData<Translation>(a).angle<< std::endl;
+    std::cout << ComponentManager::findComponentData<Speed>(a).accelaration<< std::endl;
 
-    data  = {4, 5};
+    // ComponentManager::removeEntity(a);
+    // std::cout << ComponentManager::findComponentData<Test>(a).tt << std::endl;   // report missing entity
 
-    o = q::findComponentData<Translation>(a);
-    std::cout << o.position << o.angle << std::endl;
+    ComponentManager::removeComponent<Speed>(a);
+    // std::cout << ComponentManager::findComponentData<Speed>(a).speed << std::endl;   // report missing component 
+    std::cout << ComponentManager::findComponentData<Test>(a).tt << std::endl;
+    std::cout << ComponentManager::findComponentData<Translation>(a).angle<< std::endl;
 
-    Entity b = EntityManager::getUniqueID();
-    q::registerEntity(b);
-    q::registerComponent<Translation>(b);
-    q::registerComponent<Speed>(b);
-    q::setComponentData<Speed>(b, da);
-    q::setComponentData<Translation>(b, data);
+    // Modify component
+    trans = {12, 15};
+    ComponentManager::setComponentData<Translation>(a, trans);
+    std::cout << ComponentManager::findComponentData<Test>(a).tt << std::endl;
+    std::cout << ComponentManager::findComponentData<Translation>(a).angle<< std::endl;
 
-    o = q::findComponentData<Translation>(b);
-    ou = q::findComponentData<Speed>(b);
-    std::cout << o.position << o.angle << std::endl;
-    std::cout << ou.speed<< ou.accelaration<< std::endl;
-
-    q::removeComponent<Translation>(a);
-    q::registerComponent<Translation>(a);
     return 0;
 }

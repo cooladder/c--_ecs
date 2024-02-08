@@ -1,21 +1,16 @@
 #pragma once
-#include "ECS.hpp"
 #include "ComponentArray.hpp"
-#include "EntityManager.hpp"
-#include <typeinfo>
-#include <typeindex>
 #include <set>
 #include <unordered_map>
-#include <cassert>
+#include <queue>
+
 class ComponentManager
 {
 private:
-    template<typename T>
-    static ComponentArray<T> arr;
-
-    static std::set<std::type_index>& getComponentSet(){
-        static std::set<std::type_index> *set = new std::set<std::type_index>;
-        return *set;
+    static std::unordered_map<Entity, ComponentArray>& getMap(){
+        static std::unordered_map<Entity, ComponentArray>* map = 
+                                        new std::unordered_map<Entity, ComponentArray>();
+        return *map;
     };
 
     static std::unordered_map<std::type_index, int>& getComponentID(){
@@ -29,68 +24,53 @@ private:
         return *IDgenerator;
     };
 public:
-    ComponentManager(){};
+    ComponentManager();
+
     static void init(){
         std::queue<Entity>* q = &getIdGenerator();
         for(int i = 0; i < MAX_ENTITY; i++)
             q->push(i);
     }
 
-    /// @brief Call this method before setting the data of the component.
-    /// @param type The component type
-    template<typename T>
-    static void registerComponent(){
-        assert(!getComponentSet().count(std::type_index(typeid(T))) && !getIdGenerator().empty());
-        arr<T> = ComponentArray<T>();
-        getComponentID()[std::type_index(typeid(T))] = getIdGenerator().front();
-        getIdGenerator().pop();
-        getComponentSet().insert(std::type_index(typeid(T)));
+    static void registerEntity(Entity entity){
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        (*map)[entity] = ComponentArray();
     }
 
-    /**
-     * Use setComponentData to set data to the entity.
-     * IMPORTANT: Remember to register to the given component
-     * @param entity the target
-     * @param data the component data
-    */
+    template<typename T>
+    static void registerComponent(Entity entity){
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        ComponentArray *arr = &((*map)[entity]);
+        arr->genSpace<T>();
+    }
+
     template<typename T>
     static void setComponentData(Entity entity, T data){
-        assert(getComponentSet().count(std::type_index(typeid(T))));
-        arr<T>.setData(entity, data);
-        int id = getComponentID()[std::type_index(typeid(T))];
-        Signature sig = EntityManager::find(entity);
-        sig[id] = 1;
-        EntityManager::add(entity, sig);
-    }
-
-    /**
-     * Use removeComponentData to remove data to the entity.
-     * @param entity the target
-     * @param data the component data
-    */
-    template<typename T>
-    static void removeComponentData(Entity entity){
-        assert(getComponentSet().count(std::type_index(typeid(T))) && checkEntityComponent<T>(entity));
-        arr<T>.remove(entity);
-        int id = getComponentID()[std::type_index(typeid(T))];
-        Signature sig = EntityManager::find(entity);
-        sig[id] = 0;
-        EntityManager::add(entity, sig);
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        ComponentArray *arr = &((*map)[entity]);
+        arr->setData<T>(data);
     }
 
     template<typename T>
-    static T getComponentData(Entity entity){
-        assert(getComponentSet().count(std::type_index(typeid(T))) && checkEntityComponent<T>(entity));
-        return arr<T>.find(entity);
+    static T findComponentData(Entity entity){
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        ComponentArray *arr = &((*map)[entity]);
+        return arr->find<T>();
+    }
+
+    static void removeEntity(Entity entity){
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        map->erase(entity);
     }
 
     template<typename T>
-    static bool checkEntityComponent(Entity entity){
-        int id = getComponentID()[std::type_index(typeid(T))];
-        Signature sig = EntityManager::find(entity);
-        return sig[id];
+    static void removeComponent(Entity entity){
+        std::unordered_map<Entity, ComponentArray>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        ComponentArray *arr = &((*map)[entity]);
+        arr->remove<T>();
     }
 };
-
-template<typename T>
-ComponentArray<T> ComponentManager::arr = ComponentArray<T>();

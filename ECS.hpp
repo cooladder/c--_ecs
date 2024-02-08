@@ -17,3 +17,7 @@ struct speed{
     int speed;
     int accelaration;
 }; typedef struct speed Speed;
+
+struct test{
+    int tt;
+}; typedef struct test Test;

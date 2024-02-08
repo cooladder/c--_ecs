@@ -14,17 +14,34 @@ int main(){
     Translation data = {0, 1};
     Speed da = {12, 13};
     q::registerEntity(a);
-    q::setComponentData<Translation>(a, &data);
-    q::setComponentData<Speed>(a, &da);
+    q::registerComponent<Translation>(a);
+    q::registerComponent<Speed>(a);
+    q::setComponentData<Translation>(a, data);
+    q::setComponentData<Speed>(a, da);
     Translation o = q::findComponentData<Translation>(a);
     Speed ou = q::findComponentData<Speed>(a);
 
     std::cout << o.position << o.angle << std::endl;
     std::cout << ou.speed << ou.accelaration << std::endl;
 
-    // data  = {4, 5};
+    data  = {4, 5};
 
-    // o = q::findComponentData<Translation>(a);
-    // std::cout << o.position << o.angle << std::endl;
+    o = q::findComponentData<Translation>(a);
+    std::cout << o.position << o.angle << std::endl;
+
+    Entity b = EntityManager::getUniqueID();
+    q::registerEntity(b);
+    q::registerComponent<Translation>(b);
+    q::registerComponent<Speed>(b);
+    q::setComponentData<Speed>(b, da);
+    q::setComponentData<Translation>(b, data);
+
+    o = q::findComponentData<Translation>(b);
+    ou = q::findComponentData<Speed>(b);
+    std::cout << o.position << o.angle << std::endl;
+    std::cout << ou.speed<< ou.accelaration<< std::endl;
+
+    q::removeComponent<Translation>(a);
+    q::registerComponent<Translation>(a);
     return 0;
 }

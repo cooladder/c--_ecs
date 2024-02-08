@@ -38,7 +38,14 @@ public:
     }
 
     template<typename T>
-    static void setComponentData(Entity entity, T* data){
+    static void registerComponent(Entity entity){
+        std::unordered_map<Entity, t>* map = &getMap();
+        t *arr = &((*map)[entity]);
+        arr->genSpace<T>();
+    }
+
+    template<typename T>
+    static void setComponentData(Entity entity, T data){
         std::unordered_map<Entity, t>* map = &getMap();
         assert(map->find(entity) != map->end());
         t *arr = &((*map)[entity]);
@@ -51,5 +58,19 @@ public:
         assert(map->find(entity) != map->end());
         t *arr = &((*map)[entity]);
         return arr->find<T>();
+    }
+
+    static void removeEntity(Entity entity){
+        std::unordered_map<Entity, t>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        map->erase(entity);
+    }
+
+    template<typename T>
+    static void removeComponent(Entity entity){
+        std::unordered_map<Entity, t>* map = &getMap();
+        assert(map->find(entity) != map->end());
+        t *arr = &((*map)[entity]);
+        arr->remove<T>();
     }
 };
